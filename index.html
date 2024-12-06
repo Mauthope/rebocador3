@@ -217,20 +217,18 @@
 
         // Planejamento inicial das viagens
         let viagens = [];
-        let reservas = Array(machineCounter).fill(0); // Reserva para cada máquina
         let totalPerMachine = Array(machineCounter).fill(0); // Total por máquina
 
         for (let t = 0; t < 18 * 60; t += cycleTime) { // Ciclo de 18 horas
             let viagem = Array(machineCounter).fill(0); // Viagem para cada máquina
             let remainingCapacity = rebocadorCapacity;
 
-            // Lógica de distribuição com prioridades e reservas
+            // Lógica de distribuição sem reservas
             for (let i = 0; i < machineCounter; i++) {
                 const consumoSetor = setorConsumptions[i];
-                const needed = Math.max(0, consumoSetor * cycleTime - reservas[i]);
+                const needed = consumoSetor * cycleTime;
                 const bobinas = Math.min(remainingCapacity, Math.ceil(needed));
                 viagem[i] = bobinas;
-                reservas[i] += bobinas - consumoSetor * cycleTime;
                 remainingCapacity -= bobinas;
 
                 // Acumula os totais
@@ -308,48 +306,35 @@
             startCronometro();
         } else {
             atendimentoBtn.textContent = 'Atender';
-            atendimentoCell.style.backgroundColor = 'green';  // Cor verde ao parar atendimento
+            atendimentoCell.style.backgroundColor = 'green';  // Volta ao verde ao parar
             stopCronometro();
         }
     }
 
-   // Função para alternar o cronômetro de atendimento
-function toggleCronometro(index) {
-    const viagem = document.querySelectorAll('table tr')[index + 1];
-    const atendimentoBtn = viagem.querySelector('button');
-    const atendimentoCell = viagem.querySelector('td:last-child');
-
-    if (atendimentoBtn.textContent === "Atender") {
-        atendimentoBtn.textContent = "Finalizar";
-        cronometroStartTime = Date.now();
-        cronometroInterval = setInterval(() => updateCronometro(atendimentoBtn), 1000);
-    } else {
-        const timeSpent = (Date.now() - cronometroStartTime) / 60000; // Tempo em minutos
-        clearInterval(cronometroInterval);
-        cronometroInterval = null;
-        atendimentoBtn.textContent = `Finalizado: ${timeSpent.toFixed(2)} min`;
-
-        // Aplicando a mesma lógica de cor no botão
-        if (timeSpent > parseFloat(document.getElementById('cycle-time').value)) {
-            atendimentoCell.style.backgroundColor = 'red';
-            atendimentoBtn.style.backgroundColor = 'red'; // Coloração do botão para 'red'
-        } else {
-            atendimentoCell.style.backgroundColor = 'green';
-            atendimentoBtn.style.backgroundColor = 'green'; // Coloração do botão para 'green'
+    // Função para iniciar o cronômetro
+    function startCronometro() {
+        if (cronometroInterval) {
+            clearInterval(cronometroInterval);
         }
+
+        cronometroStartTime = Date.now();
+        cronometroInterval = setInterval(() => {
+            const elapsedTime = Math.floor((Date.now() - cronometroStartTime) / 1000);
+            const minutes = Math.floor(elapsedTime / 60);
+            const seconds = elapsedTime % 60;
+            document.getElementById('cronometro').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }, 1000);
     }
-}
 
-// Função para atualizar o cronômetro
-function updateCronometro(button) {
-    const timeSpent = (Date.now() - cronometroStartTime) / 60000; // Tempo em minutos
-    button.textContent = `Em andamento: ${timeSpent.toFixed(2)} min`;
-}
-
-
-    // Carregar dados ao carregar a página
-    window.onload = loadMachineData;
+    // Função para parar o cronômetro
+    function stopCronometro() {
+        if (cronometroInterval) {
+            clearInterval(cronometroInterval);
+        }
+        document.getElementById('cronometro').textContent = "00:00";
+    }
 </script>
+
 
 
 
