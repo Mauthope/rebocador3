@@ -124,14 +124,14 @@
             machineCounter++;
             machineNames.push(machineName);  // Armazena o nome da máquina
             const setorContainer = document.createElement('div');
-            setorContainer.id = setor-${machineCounter};
-            setorContainer.innerHTML = 
+            setorContainer.id = `setor-${machineCounter}`;
+            setorContainer.innerHTML = `
                 <h3>${machineName}</h3>  
                 <label for="length-${machineCounter}">Comprimento de bobina (m):</label>
                 <input type="number" id="length-${machineCounter}" value="3000" oninput="saveMachineData()"><br><br>
                 <label for="speed-${machineCounter}">Velocidade de consumo (m/min):</label>
                 <input type="number" id="speed-${machineCounter}" value="212" oninput="saveMachineData()"><br><br>
-            ;
+            `;
             document.getElementById('setores').appendChild(setorContainer);
 
             saveMachineData(); // Salva os dados após adicionar uma máquina
@@ -144,8 +144,8 @@
     function saveMachineData() {
         let data = [];
         for (let i = 1; i <= machineCounter; i++) {
-            const length = parseFloat(document.getElementById(length-${i}).value);
-            const speed = parseFloat(document.getElementById(speed-${i}).value);
+            const length = parseFloat(document.getElementById(`length-${i}`).value);
+            const speed = parseFloat(document.getElementById(`speed-${i}`).value);
             data.push({ machine: machineNames[i - 1], length, speed });
         }
         localStorage.setItem('machineData', JSON.stringify(data));
@@ -161,14 +161,14 @@
                 machineNames.push(machine.machine);
 
                 const setorContainer = document.createElement('div');
-                setorContainer.id = setor-${machineCounter};
-                setorContainer.innerHTML = 
+                setorContainer.id = `setor-${machineCounter}`;
+                setorContainer.innerHTML = `
                     <h3>${machine.machine}</h3>  
                     <label for="length-${machineCounter}">Comprimento de bobina (m):</label>
                     <input type="number" id="length-${machineCounter}" value="${machine.length}" oninput="saveMachineData()"><br><br>
                     <label for="speed-${machineCounter}">Velocidade de consumo (m/min):</label>
                     <input type="number" id="speed-${machineCounter}" value="${machine.speed}" oninput="saveMachineData()"><br><br>
-                ;
+                `;
                 document.getElementById('setores').appendChild(setorContainer);
             });
         }
@@ -182,7 +182,7 @@
     }
 
     // Função para simular o planejamento
-function simulate() {
+  function simulate() {
     const rebocadorCapacity = parseFloat(document.getElementById('rebocador-capacity').value);
     const cycleTime = parseFloat(document.getElementById('cycle-time').value);
 
@@ -281,20 +281,20 @@ function simulate() {
         </table>
     `;
 
-        // Aplicar a coloração azul para células com valores diferentes de "F1"
-        const rows = document.querySelectorAll('table tbody tr');
-        rows.forEach(row => {
-            const cells = row.querySelectorAll('td');
-            for (let i = 1; i < cells.length - 1; i++) {  
-                const value = cells[i].textContent.trim();  // Usando trim() para evitar espaços extras
-                if (value === "F1") {
-                    cells[i].style.backgroundColor = 'yellow';  // Cor amarela se for "F1"
-                } else if (value !== "0") {
-                    cells[i].style.backgroundColor = 'blue';  // Cor azul se não for "0"
-                }
+    // Aplicar a coloração azul para células com valores diferentes de "F1"
+    const rows = document.querySelectorAll('table tbody tr');
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        for (let i = 1; i < cells.length - 1; i++) {  
+            const value = cells[i].textContent.trim();  // Usando trim() para evitar espaços extras
+            if (value === "F1") {
+                cells[i].style.backgroundColor = 'yellow';  // Cor amarela se for "F1"
+            } else if (value !== "0") {
+                cells[i].style.backgroundColor = 'blue';  // Cor azul se não for "0"
             }
-        });
-    }
+        }
+    });
+}
 
     // Função para alternar o cronômetro de atendimento
     function toggleCronometro(index) {
@@ -327,7 +327,7 @@ function toggleCronometro(index) {
         const timeSpent = (Date.now() - cronometroStartTime) / 60000; // Tempo em minutos
         clearInterval(cronometroInterval);
         cronometroInterval = null;
-        atendimentoBtn.textContent = Finalizado: ${timeSpent.toFixed(2)} min;
+        atendimentoBtn.textContent = `Finalizado: ${timeSpent.toFixed(2)} min`;
 
         // Aplicando a mesma lógica de cor no botão
         if (timeSpent > parseFloat(document.getElementById('cycle-time').value)) {
@@ -343,12 +343,16 @@ function toggleCronometro(index) {
 // Função para atualizar o cronômetro
 function updateCronometro(button) {
     const timeSpent = (Date.now() - cronometroStartTime) / 60000; // Tempo em minutos
-    button.textContent = Em andamento: ${timeSpent.toFixed(2)} min;
+    button.textContent = `Em andamento: ${timeSpent.toFixed(2)} min`;
 }
 
 
     // Carregar dados ao carregar a página
     window.onload = loadMachineData;
 </script>
+
+
+
+
 </body>
 </html>
