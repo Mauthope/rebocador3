@@ -48,6 +48,12 @@
         .result-table th {
             background-color: #f2f2f2;
         }
+        .route-table th {
+            background-color: #e6e6e6;
+        }
+        .route-container {
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -66,7 +72,14 @@
 
 <table id="matrixTable" class="result-table"></table>
 
+<div class="route-container">
+    <button onclick="generateRoute()">Gerar Roteiro de Viagens</button>
+    <table id="routeTable" class="route-table"></table>
+</div>
+
 <script>
+    let machineData = [];
+
     function generateMatrix() {
         const numMachines = document.getElementById('numMachines').value;
         const cycleTime = document.getElementById('cycleTime').value;
@@ -76,7 +89,7 @@
             return;
         }
         
-        const machineData = [];
+        machineData = [];  // Limpar dados anteriores
         const table = document.getElementById('matrixTable');
         table.innerHTML = ''; // Limpa a tabela antes de gerar nova
         
@@ -88,10 +101,6 @@
         // Preenche dados das máquinas
         for (let i = 1; i <= numMachines; i++) {
             const row = document.createElement('tr');
-            const machineInput = document.createElement('input');
-            const lengthInput = document.createElement('input');
-            const speedInput = document.createElement('input');
-            
             row.innerHTML = `
                 <td>Máquina ${i}</td>
                 <td><input type="number" id="length${i}" placeholder="Comprimento" /></td>
@@ -99,11 +108,10 @@
                 <td><input type="number" id="consume${i}" readonly /></td>
                 <td><input type="number" id="bobinas${i}" readonly /></td>
             `;
-            
             table.appendChild(row);
         }
         
-        // Adiciona a funcionalidade para calcular os dados ao clicar
+        // Botão para calcular os dados
         const calculateButton = document.createElement('button');
         calculateButton.textContent = 'Calcular Entrega';
         calculateButton.onclick = () => calculateDelivery(numMachines, cycleTime);
@@ -125,22 +133,72 @@
                 document.getElementById(`consume${i}`).value = consumeTime.toFixed(2);
                 document.getElementById(`bobinas${i}`).value = bobinasPerTrip.toFixed(2);
 
+                machineData.push({
+                    machine: `Máquina ${i}`,
+                    length: length,
+                    speed: speed,
+                    consumeTime: consumeTime,
+                    bobinasPerTrip: bobinasPerTrip
+                });
+                
                 totalCapacity += bobinasPerTrip;
             }
         }
 
         // Salvar no localStorage
-        localStorage.setItem('machineData', JSON.stringify({ numMachines, cycleTime }));
-        
+        localStorage.setItem('machineData', JSON.stringify(machineData));
         alert('Matriz de entrega calculada e salva no Local Storage!');
+    }
+
+    function generateRoute() {
+        const routeTable = document.getElementById('routeTable');
+        routeTable.innerHTML = ''; // Limpar tabela anterior
+
+        if (machineData.length === 0) {
+            alert("Por favor, calcule a matriz de entrega antes!");
+            return;
+        }
+
+        // Cabeçalho da tabela de roteiros
+        const headerRow = document.createElement('tr');
+        headerRow.innerHTML = `<th>Viagem</th><th>Máquina</th><th>Bobinas Entregues</th><th>Tempo de Consumo por Viagem (min)</th>`;
+        routeTable.appendChild(headerRow);
+
+        let viagemNumber = 1;
+        let remainingBobinas = 1000;  // Número fictício de bobinas para atender as máquinas (ajuste conforme necessário)
+
+        while (remainingBobinas > 0) {
+            for (let i = 0; i < machineData.length; i++) {
+                const machine = machineData[i];
+                const bobinasToDeliver = Math.min(machine.bobinasPerTrip, remainingBobinas);
+
+                if (bobinasToDeliver > 0) {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${viagemNumber}</td>
+                        <td>${machine.machine}</td>
+                        <td>${bobinasToDeliver}</td>
+                        <td>${machine.consumeTime.toFixed(2)}</td>
+                    `;
+                    routeTable.appendChild(row);
+
+                    remainingBobinas -= bobinasToDeliver;
+                    viagemNumber++;
+                }
+
+                if (remainingBobinas <= 0) break;
+            }
+        }
+
+        alert("Roteiro de viagens gerado!");
     }
 
     // Carregar dados se já estiverem salvos
     window.onload = () => {
         const savedData = JSON.parse(localStorage.getItem('machineData'));
         if (savedData) {
-            document.getElementById('numMachines').value = savedData.numMachines;
-            document.getElementById('cycleTime').value = savedData.cycleTime;
+            machineData = savedData;
+            document.getElementById('numMachines').value = machineData.length;
         }
     };
 </script>
