@@ -196,7 +196,7 @@
     for (let i = 1; i <= machineCounter; i++) {
         const length = parseFloat(document.getElementById(`length-${i}`).value);
         const speed = parseFloat(document.getElementById(`speed-${i}`).value);
-        const consumption = (length / speed) * 60;  // Ajuste no cálculo de consumo por hora
+        const consumption = length / speed;  // Ajuste no cálculo de consumo por hora
         setorConsumptions.push(consumption);
         totalDemand += consumption;
     }
