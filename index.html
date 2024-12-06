@@ -196,7 +196,7 @@ function simulate() {
     for (let i = 1; i <= machineCounter; i++) {
         const length = parseFloat(document.getElementById(`length-${i}`).value);
         const speed = parseFloat(document.getElementById(`speed-${i}`).value);
-        const consumption = length / speed;  // Ajuste no cálculo de consumo
+        const consumption = (length / speed) * 60;  // Ajuste no cálculo de consumo por hora
         setorConsumptions.push(consumption);
         totalDemand += consumption;
     }
@@ -249,37 +249,37 @@ function simulate() {
         viagens.push(viagem);
     }
 
-        // Renderização dos resultados
-        resultsDiv.innerHTML = 
-            <p><strong>O rebocador atende à demanda.</strong></p>
-            <p>Demanda total: ${totalDemand.toFixed(2)} bobinas/min</p>
-            <p>Capacidade do rebocador: ${rebocadorCapacityPerMinute.toFixed(2)} bobinas/min</p>
-            <table>
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        ${machineNames.map(name => <th>${name}</th>).join('')} 
-                        <th>Atendimento</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${viagens.map((viagem, index) => 
-                        <tr>
-                            <td>${index + 1}</td>
-                            ${viagem.map(bobinas => <td>${bobinas}</td>).join('')}
-                            <td><button onclick="toggleCronometro(${index})">Atender</button></td>
-                        </tr>
-                    ).join('')}
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td><strong>Total</strong></td>
-                        ${totalPerMachine.map(total => <td><strong>${total}</strong></td>).join('')}
-                        <td></td>
-                    </tr>
-                </tfoot>
-            </table>
-        ;
+    // Renderização dos resultados
+    resultsDiv.innerHTML = `
+        <p><strong>O rebocador atende à demanda.</strong></p>
+        <p>Demanda total: ${totalDemand.toFixed(2)} bobinas/min</p>
+        <p>Capacidade do rebocador: ${rebocadorCapacityPerMinute.toFixed(2)} bobinas/min</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    ${machineNames.map(name => `<th>${name}</th>`).join('')} 
+                    <th>Atendimento</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${viagens.map((viagem, index) => 
+                    `<tr>
+                        <td>${index + 1}</td>
+                        ${viagem.map(bobinas => `<td>${bobinas}</td>`).join('')}
+                        <td><button onclick="toggleCronometro(${index})">Atender</button></td>
+                    </tr>`
+                ).join('')}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td><strong>Total</strong></td>
+                    ${totalPerMachine.map(total => `<td><strong>${total}</strong></td>`).join('')}
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    `;
 
         // Aplicar a coloração azul para células com valores diferentes de "F1"
         const rows = document.querySelectorAll('table tbody tr');
